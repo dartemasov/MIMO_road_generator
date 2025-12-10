@@ -54,14 +54,19 @@ chan = builder.get_channels();                                             % gen
 chan = merge(chan, conf.segment_overlap);                                  % merge segments wiht overlaping into one channel
 %% Channel 
 H = chan.fr(conf.bw, conf.n_fft);                                          % Band-limited channel
+H = H(:, :, 1:conf.n_eff, :);                                              % Selection data subcariers
+H = single(H);
 
 [Nrx, Ntx, Nf, Nt] = size(H);
-H = reshape(H, [Nrx, 2, BS.N_ver, BS.N_hor, Nf, Nt]);                      
+
+filename = strcat("data/channel_seed_",num2str(conf.seed), ".mat");
+save(filename, "H", "conf", "-v7.3");                                      % Save channel file
 
 %% image plotting
 if debug_mode
-    layout.visualize();                                                    % visualize BS, UE positions, ue track 
+    H = reshape(H, [Nrx, 2, BS.N_ver, BS.N_hor, Nf, Nt]);    
 
+    layout.visualize();                                                    % visualize BS, UE positions, ue track 
     figure();
     tiledlayout(4, 1, "TileSpacing", "none")
     
@@ -94,8 +99,5 @@ if debug_mode
     ylabel('Elevation bin');
     xlabel('Time snapshot');
 end
-filename = strcat("data/channel_seed_",num2str(conf.seed), ".mat");
-save(filename, "H", "conf");  % Save channel file
-
 end
 
