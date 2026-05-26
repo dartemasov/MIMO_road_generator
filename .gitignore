@@ -1,6 +1,6 @@
 ### paths ###
 /data/
-/quadriga_src/
+#/quadriga_src/
 
 ### macOS ###
 # General
