@@ -1,26 +1,29 @@
 % Variables that can be changed are labeled with (!):
 
+addpath quadriga_src/
+
 conf = struct;
 
-conf.seed = 106;            % (!) random seed 
-conf.center_freq = 3.5e9;   % central frequency [Hz]
-conf.bw = 122.88e6;         % bandwidth [Hz]
-conf.n_fft = 2048;          % number of subcarriers
-conf.n_eff = 1632;          % number of selected subcarriers
-
-conf.speed_kmh = 5;         % (!) user speed [km/h]
-conf.sample_rate = 40e-3;   % (!) sample rate of channel measurements [s]. Can be: 5, 10 , 20, 40, 80, 160, 320 ms
-conf.track_len_m = 40;      % (!) user track lenght [m]
-conf.min_distance_m = 50;   % minimal distance between BS and UE along x axis [m]
-conf.n_segments = 2;        % number of uncorrelated channels
+conf.seed = 0;                      % random seed 
+conf.center_freq = 3.5e9;           % central frequency [Hz]
+conf.n_sc = 408;                    % number of subcarriers
+conf.scs = 240e3;                   % subcarrier spacing [Hz]
+conf.bw = conf.n_sc * conf.scs;     % bandwidth [Hz]
+conf.speed_kmh = 5;                 % user speed [km/h]
+conf.sample_rate = 5e-3;            % sample rate of channel measurements [s]
+conf.n_samples = 10;                % number of time samples
+conf.min_distance_m = 50;           % minimal distance between BS and UE along x axis [m]
+conf.n_segments = 10;               % number of uncorrelated channels
 conf.segment_overlap = 0.5;         % segment overlapping ratio. in range [0, 1]
 conf.use_random_initial_phase = 1;  % random phases per ray
 conf.use_absolute_delays = 0;       % LOS path has 0 delay
+conf.track_len_m = conf.speed_kmh/3.6 * conf.sample_rate * conf.n_samples;
 
 conf.possible_scenarios = ...   % Channel scenarios possible to appear 
-    {'3GPP_38.901_UMa_LOS','3GPP_38.901_UMa_NLOS', ...
-    'BERLIN_UMa_LOS', 'BERLIN_UMa_NLOS', ...
-    'DRESDEN_UMa_LOS', 'DRESDEN_UMa_NLOS'};    
+    {'3GPP_38.901_UMa_LOS'}; 
+    % {'3GPP_38.901_UMa_LOS','3GPP_38.901_UMa_NLOS', ...
+    % 'BERLIN_UMa_LOS', 'BERLIN_UMa_NLOS', ...
+    % 'DRESDEN_UMa_LOS', 'DRESDEN_UMa_NLOS'};    
 
 %% Base station config
 conf.BS = struct;
