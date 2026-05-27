@@ -53,21 +53,40 @@ builder.gen_parameters(5);                                                 % gen
 chan = builder.get_channels();                                             % generate channels
 chan = merge(chan, conf.segment_overlap);                                  % merge segments wiht overlaping into one channel
 %% Channel 
-H = chan.fr(conf.bw, conf.n_fft);                                          % Band-limited channel
-H = H(:, :, 1:conf.n_eff, :);                                              % Selection data subcariers
+conf.carriers_position = linspace(-0.5, 0.5, conf.n_sc);                   % bug fixed. SCs now are centered around carrier frequency
+H = chan.fr(conf.bw, conf.carriers_position, 1:conf.n_samples);                              % Band-limited channel
 H = single(H);
 
 [Nrx, Ntx, Nf, Nt] = size(H);
 
-filename = strcat("data/channel_seed_",num2str(conf.seed), ".mat");
-save(filename, "H", "conf", "-v7.3");                                      % Save channel file
+% Save channel
+out_dir = "data";
+fig_dir = fullfile(out_dir, "figures");
+
+if ~exist(out_dir, "dir")
+    mkdir(out_dir);
+end
+
+if ~exist(fig_dir, "dir")
+    mkdir(fig_dir);
+end
+
+filetag = strcat("channel_", strjoin(conf.scenarios, "-"), "_", num2str(conf.n_samples), "_samples_", num2str(conf.sample_rate*1000), "_ms_seed_", num2str(conf.seed));
+
+filename = fullfile(out_dir, filetag + ".mat");
+save(filename, "H", "conf", "-v7.3");   
 
 %% image plotting
 if debug_mode
     H = reshape(H, [Nrx, 2, BS.N_ver, BS.N_hor, Nf, Nt]);    
 
-    layout.visualize();                                                    % visualize BS, UE positions, ue track 
-    figure();
+    layout.visualize();                                                    % visualize BS, UE positions, ue track
+    fig_layout = gcf;
+    
+    savefig(fig_layout, fullfile(fig_dir, filetag + "_layout.fig"));
+    exportgraphics(fig_layout, fullfile(fig_dir, filetag + "_layout.png"), "Resolution", 300);
+
+    fig_profiles = figure();
     tiledlayout(4, 1, "TileSpacing", "none")
     
     %% Power
@@ -98,6 +117,9 @@ if debug_mode
     imagesc(pep);
     ylabel('Elevation bin');
     xlabel('Time snapshot');
+
+    savefig(fig_profiles, fullfile(fig_dir, filetag + "_profiles.fig"));
+    exportgraphics(fig_profiles, fullfile(fig_dir, filetag + "_profiles.png"), "Resolution", 300);
 end
 end
 
