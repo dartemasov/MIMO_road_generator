@@ -19,11 +19,26 @@ conf.use_random_initial_phase = 1;  % random phases per ray
 conf.use_absolute_delays = 0;       % LOS path has 0 delay
 conf.track_len_m = conf.speed_kmh/3.6 * conf.sample_rate * conf.n_samples;
 
-conf.possible_scenarios = ...   % Channel scenarios possible to appear 
-    {'3GPP_38.901_UMa_LOS'}; 
-    % {'3GPP_38.901_UMa_LOS','3GPP_38.901_UMa_NLOS', ...
-    % 'BERLIN_UMa_LOS', 'BERLIN_UMa_NLOS', ...
-    % 'DRESDEN_UMa_LOS', 'DRESDEN_UMa_NLOS'};    
+% Channel generator mode:
+%   "stochastic" keeps the original scenario-based road generator.
+%   "cdl" uses QuaDRiGa qd_builder.gen_cdl_model for 3GPP/V2X CDL/TDL profiles.
+conf.channel_model = "stochastic";
+
+% CDL config. Used only when conf.channel_model = "cdl".
+conf.CDL = struct;
+% conf.CDL.models = {'NR-CDL-A','NR-CDL-B','NR-CDL-C','NR-CDL-D','NR-CDL-E'};
+conf.CDL.models = {'NR-CDL-C'};
+conf.CDL.ds = [363];             % RMS delay spread [ns], [] keeps standard profile
+conf.CDL.kf = [];                % K-factor [dB], [] keeps standard profile
+conf.CDL.asd = [];               % AoD angular spread [deg], [] keeps standard profile
+conf.CDL.asa = [];               % AoA angular spread [deg], [] keeps standard profile
+conf.CDL.esd = [];               % EoD angular spread [deg], [] keeps standard profile
+conf.CDL.esa = [];               % EoA angular spread [deg], [] keeps standard profile
+conf.CDL.cas_factor = 1;         % per-cluster angular spread scaling
+
+
+conf.possible_scenarios = ...   % Channel scenarios possible to appear. See files from quadriga_src/config
+    {'3GPP_38.901_UMa_LOS'};
 
 %% Base station config
 conf.BS = struct;
